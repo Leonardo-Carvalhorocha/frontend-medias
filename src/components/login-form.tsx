@@ -11,7 +11,7 @@ function LoginForm() {
 
     useEffect(() => {
         if(localStorage.getItem('token')) {
-            navigate('/login', { replace: true });
+            navigate('/filtros', { replace: true });
         }
     }, []);
 
@@ -31,7 +31,7 @@ function LoginForm() {
       );
 
       // redirecionamento simples (ajuste se usar router)
-      navigate('/login', { replace: true });
+      navigate('/filtros', { replace: true });
     } catch (error: any) {
       setErro(
         error?.response?.data?.message ||
