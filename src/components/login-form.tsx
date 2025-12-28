@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import { login } from '../services/api-csv.service';
+import { useNavigate } from 'react-router-dom';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const navigate = useNavigate();
 
     useEffect(() => {
         if(localStorage.getItem('token')) {
-            window.location.href = '/filtros';
+            navigate('/login', { replace: true });
         }
     }, []);
 
@@ -29,7 +31,7 @@ function LoginForm() {
       );
 
       // redirecionamento simples (ajuste se usar router)
-      window.location.href = '/filtros';
+      navigate('/login', { replace: true });
     } catch (error: any) {
       setErro(
         error?.response?.data?.message ||
