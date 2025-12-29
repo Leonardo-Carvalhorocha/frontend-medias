@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from "react";
+import { useState, useRef, type ChangeEvent } from "react";
 import { calculoMedias, getSelectFiltros } from "../services/api-csv.service";
 import TablesValorForm from "./tables-valor-form";
 import Header from "./header";
@@ -18,8 +18,9 @@ function FormEnvioCsv() {
   let [file, setFile] = useState<File | null>(null);
   let [resultado, setResultado] = useState<any>(null);
   let [loading, setLoading] = useState(false);
-
   let [filtrosAbertos, setFiltrosAbertos] = useState(true);
+
+  let fileInputRef = useRef<HTMLInputElement | null>(null);
 
   let [filtros, setFiltros] = useState<FiltroForm[]>([
     {
@@ -125,11 +126,18 @@ function FormEnvioCsv() {
             onSubmit={(e) => e.preventDefault()}
           >
             <input
+              ref={fileInputRef}
               type="file"
               accept=".csv"
               onChange={handleChange}
               className="w-full text-sm text-gray-600"
             />
+
+            {file && (
+              <p className="text-sm text-gray-500">
+                Arquivo selecionado: <strong>{file.name}</strong>
+              </p>
+            )}
 
             {filtros.map((filtro, index) => (
               <div key={index} className="border rounded-lg">
