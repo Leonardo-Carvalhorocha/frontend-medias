@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import LoginForm from '../components/login-form';
@@ -46,7 +46,7 @@ function AppRoutes() {
         </div>
 
         <Footer />
-        
+
         <ModalLogout
           open={openModal}
           onConfirm={handleConfirmLogout}
