@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { getToken } from './api.auth.service';
 
 const api = axios.create({
@@ -21,14 +20,12 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => {
-    console.log("response: ", response);
     return response
   },
   (error) => {
-    const navigate = useNavigate();
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      navigate('/login', { replace: true });
+    const token = getToken(); 
+    if(error && error.status === 401 && token) {
+      window.dispatchEvent(new Event('logout-modal'));
     }
 
     return Promise.reject(error);

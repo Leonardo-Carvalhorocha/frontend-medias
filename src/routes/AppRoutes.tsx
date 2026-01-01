@@ -1,12 +1,32 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
 import LoginForm from '../components/login-form';
 import FormEnvioCsv from '../components/form-envio-csv';
 import PrivateRoute from './PrivateRoute';
 import Footer from '../components/footer';
-import { getToken } from '../services/api.auth.service';
+import { ModalLogout } from '../components/modalLogout';
+import { removeTokenLocalStorage, removeUsuarioLocalStorage } from '../services/api.auth.service';
 
 function AppRoutes() {
-    const token = getToken();
+  const [openModal, setOpenModal] = useState(false);
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const handleLogoutModal = () => {
+      setOpenModal(true);
+    };
+    window.addEventListener('logout-modal', handleLogoutModal);
+    return () => {
+      window.removeEventListener('logout-modal', handleLogoutModal);
+    };
+  }, []);
+
+  const handleConfirmLogout = () => {
+    setOpenModal(false);
+    removeTokenLocalStorage();
+    removeUsuarioLocalStorage();
+  };
 
   return (
     <BrowserRouter>
@@ -15,11 +35,7 @@ function AppRoutes() {
           <Routes>
             <Route
               path="/"
-              element={
-                token
-                  ? <Navigate to="/filtros" replace />
-                  : <Navigate to="/login" replace />
-              }
+              element={ token ? <Navigate to="/filtros" replace /> : <Navigate to="/login" replace /> }
             />
 
             <Route path="/login" element={<LoginForm />} />
@@ -31,6 +47,11 @@ function AppRoutes() {
         </div>
 
         <Footer />
+
+        <ModalLogout
+          open={openModal}
+          onConfirm={handleConfirmLogout}
+        />
       </div>
     </BrowserRouter>
   );

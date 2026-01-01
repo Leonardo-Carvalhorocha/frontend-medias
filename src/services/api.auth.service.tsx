@@ -34,3 +34,17 @@ export let setUsuarioLocalStorage = (usuario: Usuario) => {
       localStorage.setItem(localStorageNames.usuario, JSON.stringify(usuario));
     }
 }
+
+export let removeTokenLocalStorage = () => {
+    const token = getToken();
+    if(token) {
+        localStorage.removeItem(localStorageNames.token);
+    }
+}
+
+export let removeUsuarioLocalStorage = () => {
+    const usuario = getUsuario();
+    if(usuario) {
+        localStorage.removeItem(localStorageNames.usuario);
+    }
+}
