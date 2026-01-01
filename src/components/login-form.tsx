@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { login } from '../services/api-csv.service';
 import { useNavigate } from 'react-router-dom';
+import { getToken, login, setTokenLocalStorage, setUsuarioLocalStorage } from '../services/api.auth.service';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -10,7 +10,7 @@ function LoginForm() {
   const navigate = useNavigate();
 
     useEffect(() => {
-        if(localStorage.getItem('token')) {
+        if(getToken()) {
             navigate('/filtros', { replace: true });
         }
     }, []);
@@ -22,15 +22,9 @@ function LoginForm() {
 
     try {
       const resposta = await login({ email, senha });
+      setUsuarioLocalStorage(resposta.usuario);
+      setTokenLocalStorage(resposta.token);
 
-      // salva sessão
-      localStorage.setItem('token', resposta.token);
-      localStorage.setItem(
-        'usuario',
-        JSON.stringify(resposta.usuario)
-      );
-
-      // redirecionamento simples (ajuste se usar router)
       navigate('/filtros', { replace: true });
     } catch (error: any) {
       setErro(

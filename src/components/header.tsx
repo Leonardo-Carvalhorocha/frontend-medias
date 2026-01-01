@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getUsuario } from '../services/api.auth.service';
 
 type Usuario = {
   id: number;
@@ -13,10 +14,10 @@ function Header() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const usuarioStorage = localStorage.getItem('usuario');
+    const usuarioStorage = getUsuario();
 
     if (usuarioStorage) {
-      setUsuario(JSON.parse(usuarioStorage));
+      setUsuario(usuarioStorage);
     }
   }, []);
 

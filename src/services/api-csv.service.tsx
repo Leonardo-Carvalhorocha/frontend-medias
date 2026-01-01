@@ -33,8 +33,3 @@ export let downloadXlsx = async () => {
   link.remove();
   window.URL.revokeObjectURL(url);
 };
-
-export let login = async (usuario: {email: string, senha: string}) => {
-    let response = await api.post<any>('/login', usuario);
-    return response.data;
-}

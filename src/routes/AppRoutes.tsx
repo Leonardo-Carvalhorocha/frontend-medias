@@ -3,9 +3,10 @@ import LoginForm from '../components/login-form';
 import FormEnvioCsv from '../components/form-envio-csv';
 import PrivateRoute from './PrivateRoute';
 import Footer from '../components/footer';
+import { getToken } from '../services/api.auth.service';
 
 function AppRoutes() {
-    const token = localStorage.getItem('token');
+    const token = getToken();
 
   return (
     <BrowserRouter>
