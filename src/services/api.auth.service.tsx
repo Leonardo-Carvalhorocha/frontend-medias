@@ -19,7 +19,7 @@ export let getToken = (): string | undefined => {
     const token = localStorage.getItem(localStorageNames.token);
 
     if(token) {
-        return JSON.stringify(token);
+        return token;
     }
 }
 
