@@ -7,6 +7,7 @@ import PrivateRoute from './PrivateRoute';
 import Footer from '../components/footer';
 import { ModalLogout } from '../components/modalLogout';
 import { removeTokenLocalStorage, removeUsuarioLocalStorage } from '../services/api.auth.service';
+import VersaoImplementacoes from '../components/versao-implementacoes';
 
 function AppRoutes() {
   const [openModal, setOpenModal] = useState(false);
@@ -42,6 +43,7 @@ function AppRoutes() {
 
             <Route element={<PrivateRoute />}>
               <Route path="/filtros" element={<FormEnvioCsv />} />
+              <Route path="/implementacoes" element={<VersaoImplementacoes />} />
             </Route>
           </Routes>
         </div>

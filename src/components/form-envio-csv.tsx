@@ -11,6 +11,7 @@ type FiltroForm = {
   periodoInicio: string;
   periodoFim: string;
   aberto: boolean;
+  mes: number;
 };
 
 function FormEnvioCsv() {
@@ -19,7 +20,6 @@ function FormEnvioCsv() {
   let [resultado, setResultado] = useState<any>(null);
   let [loading, setLoading] = useState(false);
   let [filtrosAbertos, setFiltrosAbertos] = useState(true);
-
   let fileInputRef = useRef<HTMLInputElement | null>(null);
 
   let [filtros, setFiltros] = useState<FiltroForm[]>([
@@ -30,7 +30,8 @@ function FormEnvioCsv() {
       valorFiltro_02: '',
       periodoInicio: '',
       periodoFim: '',
-      aberto: true
+      aberto: true,
+      mes: 12
     }
   ]);
 
@@ -61,7 +62,8 @@ function FormEnvioCsv() {
         valorFiltro_02: '',
         periodoInicio: '',
         periodoFim: '',
-        aberto: true
+        aberto: true,
+        mes: 12
       }
     ]);
   }
@@ -74,12 +76,20 @@ function FormEnvioCsv() {
   function atualizarFiltro(
     index: number,
     campo: keyof FiltroForm,
-    valor: string | boolean
+    valor: string | boolean,
+    mes?: number
   ) {
     let copia = [...filtros];
-    copia[index] = { ...copia[index], [campo]: valor };
+
+    copia[index] = {
+      ...copia[index],
+      [campo]: valor,
+      ...(mes !== undefined && { mes })
+    };
+
     setFiltros(copia);
   }
+
 
   let handleSubmit = async () => {
     if (!file) return;
@@ -141,19 +151,41 @@ function FormEnvioCsv() {
 
             {filtros.map((filtro, index) => (
               <div key={index} className="border rounded-lg">
-                <div className="flex justify-between items-center p-3 bg-gray-100">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      atualizarFiltro(index, 'aberto', !filtro.aberto)
-                    }
-                    className="flex items-center gap-2 font-medium"
-                  >
-                    Filtro #{index + 1}
-                    <span className="text-xl">
-                      {filtro.aberto ? '−' : '+'}
-                    </span>
-                  </button>
+                <div>
+                  <div className="flex justify-between items-center p-3 bg-gray-100">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        atualizarFiltro(index, 'aberto', !filtro.aberto)
+                      }
+                      className="flex items-center gap-2 font-medium"
+                    >
+                      Filtro #{index + 1}
+                      <span className="text-xl">
+                        {filtro.aberto ? '−' : '+'}
+                      </span>
+                
+                    </button>
+
+                    <div className="space-x-4">
+                      <label className="text-sm font-medium text-gray-700">
+                        Dividir médias por:
+                      </label>
+
+                      <select
+                         value={filtro.mes ?? 12}
+                        onChange={(e) =>
+                          atualizarFiltro(index, 'mes', e.target.value, Number(e.target.value))
+                        }
+                        className="border rounded-lg px-3 py-2 text-sm"
+                      >
+                        {Array.from({ length: 12 }, (_, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {i + 1} meses
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
                   {filtros.length > 1 && (
                     <button
@@ -164,6 +196,7 @@ function FormEnvioCsv() {
                       Remover
                     </button>
                   )}
+                  </div>
                 </div>
 
                 {filtro.aberto && (
