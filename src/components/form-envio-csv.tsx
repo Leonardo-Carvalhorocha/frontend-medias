@@ -384,8 +384,6 @@ function FormEnvioCsv() {
         )}
       </div>
 
-      {dado && dado.resultados && <TablesValorForm dados={dado.resultados} />}
-
       {dado && dado.resultados && (
         <>
           <TablesValorForm dados={dado.resultados} />
