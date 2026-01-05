@@ -78,8 +78,7 @@ function TabelaPorFiltro({ grupo }: { grupo: any }) {
         <div>
           <h2 className="text-lg font-semibold text-gray-800">
             Funcionário:{' '}
-            {grupo.filtrados.length > 0
-              ? grupo.filtrados[0].Nome
+            {grupo.nomeFuncionario ? grupo.nomeFuncionario
               : 'Não identificado'}
           </h2>
 
