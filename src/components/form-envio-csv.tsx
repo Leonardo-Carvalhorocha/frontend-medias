@@ -1,5 +1,9 @@
 import { useState, useRef, type ChangeEvent } from "react";
-import { calculoMedias, getSelectFiltros } from "../services/api-csv.service";
+import {
+  calculoMedias,
+  getSelectFiltros,
+  pageCalculoMedias,
+} from "../services/api-csv.service";
 import TablesValorForm from "./tables-valor-form";
 import Header from "./header";
 
@@ -17,22 +21,23 @@ type FiltroForm = {
 function FormEnvioCsv() {
   let [filtrosCsv, setFiltrosCsv] = useState<string[]>([]);
   let [file, setFile] = useState<File | null>(null);
-  let [resultado, setResultado] = useState<any>(null);
+  let [dado, setdado] = useState<any>();
   let [loading, setLoading] = useState(false);
   let [filtrosAbertos, setFiltrosAbertos] = useState(true);
   let fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [page, setPage] = useState(1);
 
   let [filtros, setFiltros] = useState<FiltroForm[]>([
     {
-      colunaCsv_01: '',
-      valorFiltro_01: '',
-      colunaCsv_02: '',
-      valorFiltro_02: '',
-      periodoInicio: '',
-      periodoFim: '',
+      colunaCsv_01: "",
+      valorFiltro_01: "",
+      colunaCsv_02: "",
+      valorFiltro_02: "",
+      periodoInicio: "",
+      periodoFim: "",
       aberto: true,
-      mes: 12
-    }
+      mes: 12,
+    },
   ]);
 
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
@@ -42,7 +47,7 @@ function FormEnvioCsv() {
     setFile(selectedFile);
 
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append("file", selectedFile);
 
     carregarFiltro(formData);
   }
@@ -52,19 +57,25 @@ function FormEnvioCsv() {
     setFiltrosCsv(data.filtros);
   };
 
+  let alterarPagina = async (novaPagina: number) => {
+    setPage(novaPagina);
+    const data = await pageCalculoMedias(novaPagina);
+    setdado(data);
+  };
+
   function adicionarFiltro() {
     setFiltros((prev) => [
       ...prev,
       {
-        colunaCsv_01: '',
-        valorFiltro_01: '',
-        colunaCsv_02: '',
-        valorFiltro_02: '',
-        periodoInicio: '',
-        periodoFim: '',
+        colunaCsv_01: "",
+        valorFiltro_01: "",
+        colunaCsv_02: "",
+        valorFiltro_02: "",
+        periodoInicio: "",
+        periodoFim: "",
         aberto: true,
-        mes: 12
-      }
+        mes: 12,
+      },
     ]);
   }
 
@@ -84,30 +95,35 @@ function FormEnvioCsv() {
     copia[index] = {
       ...copia[index],
       [campo]: valor,
-      ...(mes !== undefined && { mes })
+      ...(mes !== undefined && { mes }),
     };
 
     setFiltros(copia);
   }
 
-
   let handleSubmit = async () => {
     if (!file) return;
 
-    const filtrosValidos = filtros.filter(
-      f => f.colunaCsv_01 && f.valorFiltro_01
-    );
+    const filtrosValidos = filtros.filter((f) => {
+      if (!f.colunaCsv_01) return false;
+
+      if (f.colunaCsv_01 === "Período Aquisitivo") {
+        return !!f.periodoInicio && !!f.periodoFim;
+      }
+
+      return !!f.valorFiltro_01;
+    });
 
     if (filtrosValidos.length === 0) return;
 
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('filtros', JSON.stringify(filtrosValidos));
+    formData.append("file", file);
+    formData.append("filtros", JSON.stringify(filtrosValidos));
 
     try {
       setLoading(true);
-      let data = await calculoMedias(formData);
-      setResultado(data);
+      let data = await calculoMedias(formData, page);
+      setdado(data);
       setFiltrosAbertos(false);
     } finally {
       setLoading(false);
@@ -125,16 +141,11 @@ function FormEnvioCsv() {
           className="w-full flex justify-between items-center px-6 py-4 bg-gray-100 font-semibold text-gray-700"
         >
           Filtros CSV
-          <span className="text-xl">
-            {filtrosAbertos ? '−' : '+'}
-          </span>
+          <span className="text-xl">{filtrosAbertos ? "−" : "+"}</span>
         </button>
 
         {filtrosAbertos && (
-          <form
-            className="space-y-4 p-6"
-            onSubmit={(e) => e.preventDefault()}
-          >
+          <form className="space-y-4 p-6" onSubmit={(e) => e.preventDefault()}>
             <input
               ref={fileInputRef}
               type="file"
@@ -156,15 +167,14 @@ function FormEnvioCsv() {
                     <button
                       type="button"
                       onClick={() =>
-                        atualizarFiltro(index, 'aberto', !filtro.aberto)
+                        atualizarFiltro(index, "aberto", !filtro.aberto)
                       }
                       className="flex items-center gap-2 font-medium"
                     >
                       Filtro #{index + 1}
                       <span className="text-xl">
-                        {filtro.aberto ? '−' : '+'}
+                        {filtro.aberto ? "−" : "+"}
                       </span>
-                
                     </button>
 
                     <div className="space-x-4">
@@ -173,9 +183,14 @@ function FormEnvioCsv() {
                       </label>
 
                       <select
-                         value={filtro.mes ?? 12}
+                        value={filtro.mes ?? 12}
                         onChange={(e) =>
-                          atualizarFiltro(index, 'mes', e.target.value, Number(e.target.value))
+                          atualizarFiltro(
+                            index,
+                            "mes",
+                            e.target.value,
+                            Number(e.target.value)
+                          )
                         }
                         className="border rounded-lg px-3 py-2 text-sm"
                       >
@@ -187,15 +202,15 @@ function FormEnvioCsv() {
                       </select>
                     </div>
 
-                  {filtros.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removerFiltro(index)}
-                      className="text-red-600 text-sm hover:underline"
-                    >
-                      Remover
-                    </button>
-                  )}
+                    {filtros.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removerFiltro(index)}
+                        className="text-red-600 text-sm hover:underline"
+                      >
+                        Remover
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -203,57 +218,40 @@ function FormEnvioCsv() {
                   <div className="p-4 space-y-3">
                     <select
                       value={filtro.colunaCsv_01}
-                      onChange={(e) =>
-                        atualizarFiltro(index, 'colunaCsv_01', e.target.value)
-                      }
-                      className="w-full rounded-lg border p-2"
-                    >
-                      <option value="">Campo filtro 01</option>
-                      {filtrosCsv.map((f) => (
-                        <option key={f} value={f}>{f}</option>
-                      ))}
-                    </select>
-
-                    <input
-                      type="text"
-                      value={filtro.valorFiltro_01}
-                      onChange={(e) =>
-                        atualizarFiltro(index, 'valorFiltro_01', e.target.value)
-                      }
-                      className="w-full rounded-lg border p-2"
-                      placeholder="Valor filtro 01"
-                    />
-
-                    <select
-                      value={filtro.colunaCsv_02}
                       onChange={(e) => {
                         setFiltros((prev) => {
                           const copia = [...prev];
                           copia[index] = {
                             ...copia[index],
-                            colunaCsv_02: e.target.value,
-                            valorFiltro_02: '',
-                            periodoInicio: '',
-                            periodoFim: ''
+                            colunaCsv_01: e.target.value,
+                            valorFiltro_01: "",
+                            periodoInicio: "",
+                            periodoFim: "",
                           };
                           return copia;
                         });
                       }}
                       className="w-full rounded-lg border p-2"
                     >
-                      <option value="">Campo filtro 02 (opcional)</option>
+                      <option value="">Campo filtro 01</option>
                       {filtrosCsv.map((f) => (
-                        <option key={f} value={f}>{f}</option>
+                        <option key={f} value={f}>
+                          {f}
+                        </option>
                       ))}
                     </select>
 
-                    {filtro.colunaCsv_02 === 'Período Aquisitivo' ? (
+                    {filtro.colunaCsv_01 === "Período Aquisitivo" ? (
                       <div className="flex gap-2">
                         <input
                           type="month"
                           value={filtro.periodoInicio}
                           onChange={(e) =>
-                            atualizarFiltro(index, 'periodoInicio', e.target.value)
+                            atualizarFiltro(
+                              index,
+                              "periodoInicio",
+                              e.target.value
+                            )
                           }
                           className="w-full border rounded-lg p-2"
                         />
@@ -262,7 +260,7 @@ function FormEnvioCsv() {
                           type="month"
                           value={filtro.periodoFim}
                           onChange={(e) =>
-                            atualizarFiltro(index, 'periodoFim', e.target.value)
+                            atualizarFiltro(index, "periodoFim", e.target.value)
                           }
                           className="w-full border rounded-lg p-2"
                         />
@@ -270,13 +268,90 @@ function FormEnvioCsv() {
                     ) : (
                       <input
                         type="text"
-                        value={filtro.valorFiltro_02}
+                        value={filtro.valorFiltro_01}
                         onChange={(e) =>
-                          atualizarFiltro(index, 'valorFiltro_02', e.target.value)
+                          atualizarFiltro(
+                            index,
+                            "valorFiltro_01",
+                            e.target.value
+                          )
                         }
                         className="w-full rounded-lg border p-2"
-                        placeholder="Valor filtro 02"
+                        placeholder="Valor filtro 01"
                       />
+                    )}
+
+                    {filtro.colunaCsv_01 !== "Período Aquisitivo" && (
+                      <>
+                        <select
+                          value={filtro.colunaCsv_02}
+                          onChange={(e) => {
+                            setFiltros((prev) => {
+                              const copia = [...prev];
+                              copia[index] = {
+                                ...copia[index],
+                                colunaCsv_02: e.target.value,
+                                valorFiltro_02: "",
+                                periodoInicio: "",
+                                periodoFim: "",
+                              };
+                              return copia;
+                            });
+                          }}
+                          className="w-full rounded-lg border p-2"
+                        >
+                          <option value="">Campo filtro 02 (opcional)</option>
+                          {filtrosCsv.map((f) => (
+                            <option key={f} value={f}>
+                              {f}
+                            </option>
+                          ))}
+                        </select>
+
+                        {filtro.colunaCsv_02 === "Período Aquisitivo" ? (
+                          <div className="flex gap-2">
+                            <input
+                              type="month"
+                              value={filtro.periodoInicio}
+                              onChange={(e) =>
+                                atualizarFiltro(
+                                  index,
+                                  "periodoInicio",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full border rounded-lg p-2"
+                            />
+
+                            <input
+                              type="month"
+                              value={filtro.periodoFim}
+                              onChange={(e) =>
+                                atualizarFiltro(
+                                  index,
+                                  "periodoFim",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full border rounded-lg p-2"
+                            />
+                          </div>
+                        ) : (
+                          <input
+                            type="text"
+                            value={filtro.valorFiltro_02}
+                            onChange={(e) =>
+                              atualizarFiltro(
+                                index,
+                                "valorFiltro_02",
+                                e.target.value
+                              )
+                            }
+                            className="w-full rounded-lg border p-2"
+                            placeholder="Valor filtro 02"
+                          />
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -296,16 +371,54 @@ function FormEnvioCsv() {
               onClick={handleSubmit}
               disabled={loading}
               className={`w-full py-2 rounded-lg text-white transition
-                ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}
+                ${
+                  loading
+                    ? "bg-blue-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                }
               `}
             >
-              {loading ? 'Processando...' : 'Filtrar'}
+              {loading ? "Processando..." : "Filtrar"}
             </button>
           </form>
         )}
       </div>
 
-      {resultado && <TablesValorForm dados={resultado} />}
+      {dado && dado.resultados && <TablesValorForm dados={dado.resultados} />}
+
+      {dado && dado.resultados && (
+        <>
+          <TablesValorForm dados={dado.resultados} />
+
+          {dado.totalPages > 1 && (
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t">
+              <div className="flex justify-center items-center gap-4 py-3">
+                <button
+                  onClick={() => alterarPagina(Math.max(page - 1, 1))}
+                  disabled={page === 1}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Anterior
+                </button>
+
+                <span className="text-sm text-gray-700 font-medium">
+                  Página {page} de {dado.totalPages}
+                </span>
+
+                <button
+                  onClick={() =>
+                    alterarPagina(Math.min(page + 1, dado.totalPages))
+                  }
+                  disabled={page === dado.totalPages}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Próxima
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

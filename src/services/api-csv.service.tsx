@@ -5,8 +5,14 @@ export let getSelectFiltros = async(formData: FormData): Promise<{filtros: strin
     return response.data;
 }
 
-export let calculoMedias = async(formData: FormData): Promise<any> => {
-    let response = await api.post<any>('/calculo-medias', formData);
+export let calculoMedias = async(formData: FormData, page: number): Promise<any> => {
+    let response = await api.post<any>(`/calculo-medias?page${page}`, formData);
+    return response.data;
+}
+
+
+export let pageCalculoMedias = async(page: number): Promise<any> => {
+    let response = await api.post<any>(`/page-medias?page=${page}`);
     return response.data;
 }
 

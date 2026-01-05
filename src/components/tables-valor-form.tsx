@@ -1,30 +1,19 @@
 import { useMemo, useState } from 'react';
 import { downloadXlsx } from '../services/api-csv.service';
 
-type GrupoFiltrado = {
-  filtroAplicado: string;
-  filtrados: Record<string, string>[];
-  totalValorMedias: string;
-  totalFiltrados: number;
-};
-
-type TablesValorFormProps = {
-  dados: GrupoFiltrado[];
-};
-
 const LIMITE_REGISTROS_POR_PAGINA = 100;
 const ALTURA_FIXA_TABELA_PX = 480;
 
-function TablesValorForm({ dados }: TablesValorFormProps) {
+function TablesValorForm({ dados }: any) {
   if (!dados || !dados.length) return null;
 
+  console.log("DADOS PASSOU: ", dados);
   function handleDownloadXlsx() {
     downloadXlsx();
   }
 
   return (
     <div className="mt-10 space-y-6">
-      {/* BOTÃO DE DOWNLOAD */}
       <div className="flex justify-end">
         <button
           type="button"
@@ -34,9 +23,8 @@ function TablesValorForm({ dados }: TablesValorFormProps) {
         </button>
       </div>
 
-      {/* TABELAS */}
       <div className="space-y-10">
-        {dados.map((grupo, indiceGrupo) => (
+        {dados.map((grupo: any, indiceGrupo: any) => (
           <TabelaPorFiltro
             key={`${grupo.filtroAplicado}-${indiceGrupo}`}
             grupo={grupo}
@@ -47,10 +35,7 @@ function TablesValorForm({ dados }: TablesValorFormProps) {
   );
 }
 
-/**
- * Componente isolado por filtro aplicado
- */
-function TabelaPorFiltro({ grupo }: { grupo: GrupoFiltrado }) {
+function TabelaPorFiltro({ grupo }: { grupo: any }) {
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [aberto, setAberto] = useState(true);
 
@@ -118,7 +103,6 @@ function TabelaPorFiltro({ grupo }: { grupo: GrupoFiltrado }) {
         </span>
       </button>
 
-      {/* CONTEÚDO */}
       {aberto && (
         <div className="p-4 space-y-4">
           {grupo.filtrados.length === 0 ? (
@@ -134,7 +118,6 @@ function TabelaPorFiltro({ grupo }: { grupo: GrupoFiltrado }) {
             </div>
           ) : (
             <>
-              {/* TABELA */}
               <div
                 className="overflow-y-auto border border-gray-300 rounded-lg"
                 style={{ maxHeight: ALTURA_FIXA_TABELA_PX }}
@@ -154,7 +137,7 @@ function TabelaPorFiltro({ grupo }: { grupo: GrupoFiltrado }) {
                   </thead>
 
                   <tbody>
-                    {registrosPaginados.map((registro, index) => (
+                    {registrosPaginados.map((registro: any, index: any) => (
                       <tr
                         key={index}
                         className="even:bg-gray-50 hover:bg-blue-50"
@@ -173,7 +156,6 @@ function TabelaPorFiltro({ grupo }: { grupo: GrupoFiltrado }) {
                 </table>
               </div>
 
-              {/* RODAPÉ */}
               <div className="flex justify-between items-center text-sm text-gray-700">
                 <span>
                   <strong>Total:</strong>{' '}
@@ -186,7 +168,6 @@ function TabelaPorFiltro({ grupo }: { grupo: GrupoFiltrado }) {
                 </span>
               </div>
 
-              {/* PAGINAÇÃO */}
               {totalPaginas > 1 && (
                 <div className="flex justify-center gap-4">
                   <button

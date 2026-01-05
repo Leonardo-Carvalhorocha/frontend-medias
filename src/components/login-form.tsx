@@ -1,19 +1,24 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getToken, login, setTokenLocalStorage, setUsuarioLocalStorage } from '../services/api.auth.service';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  getToken,
+  login,
+  setTokenLocalStorage,
+  setUsuarioLocalStorage,
+} from "../services/api.auth.service";
 
 function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const navigate = useNavigate();
 
-    useEffect(() => {
-        if(getToken()) {
-            navigate('/filtros', { replace: true });
-        }
-    }, []);
+  useEffect(() => {
+    if (getToken()) {
+      navigate("/filtros", { replace: true });
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,12 +30,9 @@ function LoginForm() {
       setUsuarioLocalStorage(resposta.usuario);
       setTokenLocalStorage(resposta.token);
 
-      navigate('/filtros', { replace: true });
+      navigate("/filtros", { replace: true });
     } catch (error: any) {
-      setErro(
-        error?.response?.data?.message ||
-          'Erro ao realizar login'
-      );
+      setErro(error?.response?.data?.message || "Erro ao realizar login");
     } finally {
       setCarregando(false);
     }
@@ -86,7 +88,7 @@ function LoginForm() {
             className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg font-medium
                        hover:bg-blue-700 disabled:opacity-60 transition"
           >
-            {carregando ? 'Entrando...' : 'Entrar'}
+            {carregando ? "Entrando..." : "Entrar"}
           </button>
         </form>
       </div>
