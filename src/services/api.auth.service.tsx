@@ -4,7 +4,7 @@ import api from "./api";
 const localStorageNames = { usuario: 'usuario', token: "token" };
 
 export let login = async (usuario: {email: string, senha: string}): Promise<{usuario: Usuario, token: string}> => {
-    let response = await api.post<{usuario: Usuario, token: string}>('/login', usuario);
+    let response = await api.post<{usuario: Usuario, token: string}>('/auth/login', usuario);
     return response.data;
 }
 

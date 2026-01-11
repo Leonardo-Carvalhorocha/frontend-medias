@@ -1,23 +1,23 @@
 import api from "./api";
 
 export let getSelectFiltros = async(formData: FormData): Promise<{filtros: string[]}> => {
-    let response = await api.post<{filtros: string[]}>('/select-filtros', formData);
+    let response = await api.post<{filtros: string[]}>('/medias/select-filtros', formData);
     return response.data;
 }
 
 export let calculoMedias = async(formData: FormData, page: number): Promise<any> => {
-    let response = await api.post<any>(`/calculo-medias?page${page}`, formData);
+    let response = await api.post<any>(`/medias/calculo-medias?page${page}`, formData);
     return response.data;
 }
 
 
 export let pageCalculoMedias = async(page: number): Promise<any> => {
-    let response = await api.post<any>(`/page-medias?page=${page}`);
+    let response = await api.post<any>(`/medias/page-medias?page=${page}`);
     return response.data;
 }
 
 export let downloadXlsx = async () => {
-  const response = await api.post('/download', null, {
+  const response = await api.post('/medias/download', null, {
     responseType: 'blob'
   });
 
