@@ -11,6 +11,7 @@ import {
   removeUsuarioLocalStorage,
 } from "../services/api.auth.service";
 import VersaoImplementacoes from "../components/versao-implementacoes";
+import GlobalError from "../components/GlobalError";
 
 function AppRoutes() {
   const [openModal, setOpenModal] = useState(false);
@@ -63,6 +64,7 @@ function AppRoutes() {
         <Footer />
 
         <ModalLogout open={openModal} onConfirm={handleConfirmLogout} />
+        <GlobalError />
       </div>
     </BrowserRouter>
   );

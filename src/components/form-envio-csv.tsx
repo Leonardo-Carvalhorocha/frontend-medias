@@ -1,13 +1,18 @@
-import { useState, useRef, type ChangeEvent } from "react";
+import { useState, useRef, type ChangeEvent, useEffect } from "react";
 import {
+  adicionarFileLocalStorage,
+  adicionarFiltroLocalStorage,
   calculoMedias,
+  getFileLocalStorage,
+  getFiltrosLocalStorage,
   getSelectFiltros,
+  montarFiltros,
   pageCalculoMedias,
 } from "../services/api-csv.service";
 import TablesValorForm from "./tables-valor-form";
 import Header from "./header";
 
-type FiltroForm = {
+export type FiltroForm = {
   colunaCsv_01: string;
   valorFiltro_01: string;
   colunaCsv_02: string;
@@ -20,14 +25,14 @@ type FiltroForm = {
 
 function FormEnvioCsv() {
   let [filtrosCsv, setFiltrosCsv] = useState<string[]>([]);
-  let [file, setFile] = useState<File | null>(null);
+  let [file, setFile] = useState<File | null>(getFileLocalStorage());
   let [dado, setdado] = useState<any>();
   let [loading, setLoading] = useState(false);
   let [filtrosAbertos, setFiltrosAbertos] = useState(true);
   let fileInputRef = useRef<HTMLInputElement | null>(null);
   const [page, setPage] = useState(1);
 
-  let [filtros, setFiltros] = useState<FiltroForm[]>([
+  let [filtros, setFiltros] = useState<FiltroForm[]>(getFiltrosLocalStorage() || [
     {
       colunaCsv_01: "",
       valorFiltro_01: "",
@@ -40,14 +45,27 @@ function FormEnvioCsv() {
     },
   ]);
 
+  useEffect(() => {
+    if(filtros !== null) {
+      setFiltros(filtros);
+    }
+    if(file) {
+      initFileSet(file);
+    }
+  }, [])
+
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
     let selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
 
-    setFile(selectedFile);
+    initFileSet(selectedFile);
+  }
 
+  let initFileSet = (fileInit: File) => {
+    setFile(fileInit);
+    adicionarFileLocalStorage(fileInit);
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append("file", fileInit);
 
     carregarFiltro(formData);
   }
@@ -79,6 +97,17 @@ function FormEnvioCsv() {
     ]);
   }
 
+  async function adicionarFiltroPreenchidosDoCsv(event: ChangeEvent<HTMLInputElement>) {
+    let selectedFile = event.target.files?.[0];
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    const data: FiltroForm[] = await montarFiltros(formData);
+    setFiltros(data)
+    adicionarFiltroLocalStorage(data);
+  }
+
   function removerFiltro(index: number) {
     if (filtros.length === 1) return;
     setFiltros((prev) => prev.filter((_, i) => i !== index));
@@ -99,6 +128,7 @@ function FormEnvioCsv() {
     };
 
     setFiltros(copia);
+    // adicionarFiltroLocalStorage(filtros);
   }
 
   let handleSubmit = async () => {
@@ -115,7 +145,7 @@ function FormEnvioCsv() {
     });
 
     if (filtrosValidos.length === 0) return;
-
+    adicionarFiltroLocalStorage(filtrosValidos);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("filtros", JSON.stringify(filtrosValidos));
@@ -151,8 +181,39 @@ function FormEnvioCsv() {
               type="file"
               accept=".csv"
               onChange={handleChange}
-              className="w-full text-sm text-gray-600"
+              className="block w-full text-sm text-gray-600
+             file:mr-4 file:py-2 file:px-4
+             file:rounded-md file:border-0
+             file:text-sm file:font-medium
+             file:bg-gray-100 file:text-gray-700
+             hover:file:bg-gray-200
+             cursor-pointer"
             />
+
+            {filtrosCsv && filtrosCsv.length > 0 && (
+              <div className="mt-4 p-4 border border-gray-200 rounded-md bg-gray-50">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                  Filtros dinâmicos
+                </h3>
+
+                <p className="text-xs text-gray-500 mb-3">
+                  Selecione um arquivo CSV para aplicar os filtros
+                  automaticamente.
+                </p>
+
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={adicionarFiltroPreenchidosDoCsv}
+                  className="block w-full text-sm text-gray-600
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-medium
+                        file:bg-gray-200 file:text-gray-700
+                        hover:file:bg-gray-300"
+                />
+              </div>
+            )}
 
             {file && (
               <p className="text-sm text-gray-500">

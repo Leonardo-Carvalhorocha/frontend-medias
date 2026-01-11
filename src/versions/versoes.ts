@@ -13,5 +13,15 @@ export const versoes: Versao[] = [
     numero: '0.0.4',
     descricao:
       'Adicionado filtro para trazer todos os funcionários da empresa apenas pelo período com uma única busca na base de dados, foi modificado o backend, paginando o filtro para que o payload da requisição fique longo, a páginação conta com 25 elementos cada. Renata Cardoso (Recursos Humanos)'
+  },
+  {
+    numero: '0.0.5',
+    descricao:
+      'Correção download, quando não há funcionário existente pelo filtro ou quando não há periodo daquele funcionário. Alexia Sarah (RH)'
+  },
+  {
+    numero: '0.0.6',
+    descricao:
+      'Ao enviar um arquivo com as colunas id, periodoInicial, periodoFinal e mes os filtros são preenchidos automaticamentes.'
   }
 ];

@@ -7,7 +7,6 @@ const ALTURA_FIXA_TABELA_PX = 480;
 function TablesValorForm({ dados }: any) {
   if (!dados || !dados.length) return null;
 
-  console.log("DADOS PASSOU: ", dados);
   function handleDownloadXlsx() {
     downloadXlsx();
   }
