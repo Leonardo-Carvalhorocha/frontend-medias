@@ -111,6 +111,8 @@ function FormEnvioCsv() {
   function removerFiltro(index: number) {
     if (filtros.length === 1) return;
     setFiltros((prev) => prev.filter((_, i) => i !== index));
+
+    adicionarFiltroLocalStorage(filtros);
   }
 
   function atualizarFiltro(
