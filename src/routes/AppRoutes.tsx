@@ -12,6 +12,7 @@ import {
 } from "../services/api.auth.service";
 import VersaoImplementacoes from "../components/versao-implementacoes";
 import GlobalError from "../components/GlobalError";
+import AdiantamentoDecimoTerceiro from "../components/form-adiantamentodecimo";
 
 function AppRoutes() {
   const [openModal, setOpenModal] = useState(false);
@@ -57,6 +58,7 @@ function AppRoutes() {
                 path="/implementacoes"
                 element={<VersaoImplementacoes />}
               />
+              <Route path="/filtro-adto" element={<AdiantamentoDecimoTerceiro />}/>
             </Route>
           </Routes>
         </div>

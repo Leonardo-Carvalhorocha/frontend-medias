@@ -1,3 +1,4 @@
+import type { AdiantamentoDecimoTerceiroDTO } from "../components/form-adiantamentodecimo";
 import type { FiltroForm } from "../components/form-envio-csv";
 import api from "./api";
 
@@ -52,6 +53,11 @@ export let montarFiltros = async (formData: FormData): Promise<FiltroForm[]> => 
   let response = await api.post<FiltroForm[]>(`/medias/build-filtros`, formData);
   return response.data;
 };
+
+export let filtroADTO = async (id: number[]): Promise<{total: number,dados: AdiantamentoDecimoTerceiroDTO[]}>  => {
+  let response = await api.post<{total: number,dados: AdiantamentoDecimoTerceiroDTO[]}>(`/decimo-terceiro/filtrar`, {filtro: id});
+  return response.data;
+}
 
 export let adicionarFiltroLocalStorage = (filtroForm: FiltroForm[]) => {
   if(filtroForm && filtroForm.length > 0) {

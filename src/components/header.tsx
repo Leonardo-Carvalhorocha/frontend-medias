@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getUsuario } from "../services/api.auth.service";
-import { Link } from "react-router-dom";
 
 type Usuario = {
   id: number;
@@ -11,7 +10,7 @@ type Usuario = {
 
 function Header() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarModal, setMostrarModal] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +21,7 @@ function Header() {
     }
   }, []);
 
-  function confirmarLogout() {
+  function confirmarLogout(): void {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
     navigate("/login", { replace: true });
@@ -35,11 +34,20 @@ function Header() {
           <h1 className="text-lg font-semibold text-gray-800">
             <Link to="/filtros">Sistema de Médias</Link>
           </h1>
+
           {usuario && (
             <div className="flex items-center gap-4 text-sm text-gray-700">
               <span>
                 Olá, <strong>{usuario.nome}</strong>
               </span>
+
+              {/* NOVO ITEM */}
+              <Link
+                to="/filtro-adto"
+                className="px-3 py-1 rounded-md border border-blue-500 text-blue-600 hover:bg-blue-50 transition"
+              >
+                Filtro ADTO
+              </Link>
 
               <Link
                 to="/implementacoes"
