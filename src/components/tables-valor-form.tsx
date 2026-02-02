@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { downloadXlsx } from '../services/api-csv.service';
+import { useMemo, useState } from "react";
+import { downloadXlsx } from "../services/api-csv.service";
 
 const LIMITE_REGISTROS_POR_PAGINA = 100;
 const ALTURA_FIXA_TABELA_PX = 480;
@@ -12,25 +12,36 @@ function TablesValorForm({ dados }: any) {
   }
 
   function handleCopiarTudo() {
-    let texto = 'ID\tMÉDIA\n'; // cabeçalho
+    let texto = "ID\tNome\tPeríodo Aquisitivo\tElemento People\tTotal Valor\n";
 
     dados.forEach((grupo: any) => {
       if (!grupo.filtrados || grupo.filtrados.length === 0) return;
 
-      const id = grupo.filtrados[0]?.ID || ''; 
-      const media = grupo.totalValorMedias ?? '';
+      // Linhas da tabela
+      grupo.filtrados.forEach((registro: any) => {
+        const linha = [
+          registro.ID,
+          registro.Nome,
+          registro["Período Aquisitivo"],
+          registro["Elemento People"],
+          registro["Total Valor"],
+        ].join("\t");
 
-      texto += `${id}\t${media}\n`;
+        texto += linha + "\n";
+      });
+
+      // Linhas de resumo do filtro (igual ao que aparece na tela)
+      texto += `Total:\t${grupo.totalFiltrados}\n`;
+      texto += `Média:\t${grupo.totalValorMedias}\n\n`; // linha em branco para separar grupos
     });
 
     navigator.clipboard.writeText(texto);
-    alert('ID + Média copiados para a área de transferência!');
+    alert("Tabela completa copiada para a área de transferência!");
   }
 
   return (
     <div className="mt-10 space-y-6">
       <div className="flex justify-end gap-4">
-
         <button
           type="button"
           onClick={handleCopiarTudo}
@@ -42,7 +53,8 @@ function TablesValorForm({ dados }: any) {
         <button
           type="button"
           onClick={handleDownloadXlsx}
-          className="px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-60 transition" >
+          className="px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-60 transition"
+        >
           Baixar XLSX
         </button>
       </div>
@@ -64,19 +76,15 @@ function TabelaPorFiltro({ grupo }: { grupo: any }) {
   const [aberto, setAberto] = useState(true);
 
   const headers =
-    grupo.filtrados.length > 0
-      ? Object.keys(grupo.filtrados[0])
-      : [];
+    grupo.filtrados.length > 0 ? Object.keys(grupo.filtrados[0]) : [];
 
   const totalPaginas = Math.ceil(
-    grupo.filtrados.length / LIMITE_REGISTROS_POR_PAGINA
+    grupo.filtrados.length / LIMITE_REGISTROS_POR_PAGINA,
   );
 
   const registrosPaginados = useMemo(() => {
-    const indiceInicial =
-      (paginaAtual - 1) * LIMITE_REGISTROS_POR_PAGINA;
-    const indiceFinal =
-      indiceInicial + LIMITE_REGISTROS_POR_PAGINA;
+    const indiceInicial = (paginaAtual - 1) * LIMITE_REGISTROS_POR_PAGINA;
+    const indiceFinal = indiceInicial + LIMITE_REGISTROS_POR_PAGINA;
 
     return grupo.filtrados.slice(indiceInicial, indiceFinal);
   }, [grupo.filtrados, paginaAtual]);
@@ -86,9 +94,7 @@ function TabelaPorFiltro({ grupo }: { grupo: any }) {
   }
 
   function irParaPaginaSeguinte() {
-    setPaginaAtual((pagina) =>
-      Math.min(pagina + 1, totalPaginas)
-    );
+    setPaginaAtual((pagina) => Math.min(pagina + 1, totalPaginas));
   }
 
   return (
@@ -101,35 +107,28 @@ function TabelaPorFiltro({ grupo }: { grupo: any }) {
       >
         <div>
           <h2 className="text-lg font-semibold text-gray-800">
-            Funcionário:{' '}
-            {grupo.nomeFuncionario ? grupo.nomeFuncionario
-              : 'Não identificado'}
+            Funcionário:{" "}
+            {grupo.nomeFuncionario ? grupo.nomeFuncionario : "Não identificado"}
           </h2>
 
           <p className="text-sm text-gray-600">
-            registros encontrados:{' '}
-            <span className="font-semibold">
-              {grupo.totalFiltrados}
-            </span>
+            registros encontrados:{" "}
+            <span className="font-semibold">{grupo.totalFiltrados}</span>
           </p>
 
           <p className="text-sm text-gray-600">
-            Filtro aplicado:{' '}
-            <span className="font-semibold">
-              {grupo.filtroAplicado}
-            </span>
+            Filtro aplicado:{" "}
+            <span className="font-semibold">{grupo.filtroAplicado}</span>
           </p>
 
           <p className="text-sm text-gray-600">
-            Período aquisitivo:{' '}
-            <span className="font-semibold">
-              {grupo.periodoAquisitivo}
-            </span>
+            Período aquisitivo:{" "}
+            <span className="font-semibold">{grupo.periodoAquisitivo}</span>
           </p>
         </div>
 
         <span className="text-2xl font-bold text-gray-600">
-          {aberto ? '−' : '+'}
+          {aberto ? "−" : "+"}
         </span>
       </button>
 
@@ -137,12 +136,9 @@ function TabelaPorFiltro({ grupo }: { grupo: any }) {
         <div className="p-4 space-y-4">
           {grupo.filtrados.length === 0 ? (
             <div className="border border-yellow-300 bg-yellow-50 rounded-lg p-4 text-sm text-yellow-800">
-              <p className="font-semibold mb-1">
-                Nenhum registro encontrado
-              </p>
+              <p className="font-semibold mb-1">Nenhum registro encontrado</p>
               <p>
-                O filtro aplicado{' '}
-                <strong>{grupo.filtroAplicado}</strong> não
+                O filtro aplicado <strong>{grupo.filtroAplicado}</strong> não
                 retornou resultados para este arquivo CSV.
               </p>
             </div>
@@ -160,7 +156,7 @@ function TabelaPorFiltro({ grupo }: { grupo: any }) {
                           key={header}
                           className="px-4 py-2 text-left text-sm font-semibold text-gray-700 border-b"
                         >
-                          {header.replace('﻿', '').trim()}
+                          {header.replace("﻿", "").trim()}
                         </th>
                       ))}
                     </tr>
@@ -188,13 +184,11 @@ function TabelaPorFiltro({ grupo }: { grupo: any }) {
 
               <div className="flex justify-between items-center text-sm text-gray-700">
                 <span>
-                  <strong>Total:</strong>{' '}
-                  {grupo.totalFiltrados}
+                  <strong>Total:</strong> {grupo.totalFiltrados}
                 </span>
 
                 <span>
-                  <strong>Média:</strong>{' '}
-                  {grupo.totalValorMedias}
+                  <strong>Média:</strong> {grupo.totalValorMedias}
                 </span>
               </div>
 
