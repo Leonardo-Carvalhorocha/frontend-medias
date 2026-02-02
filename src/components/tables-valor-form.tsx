@@ -11,9 +11,34 @@ function TablesValorForm({ dados }: any) {
     downloadXlsx();
   }
 
+  function handleCopiarTudo() {
+    let texto = 'ID\tMÉDIA\n'; // cabeçalho
+
+    dados.forEach((grupo: any) => {
+      if (!grupo.filtrados || grupo.filtrados.length === 0) return;
+
+      const id = grupo.filtrados[0]?.ID || ''; 
+      const media = grupo.totalValorMedias ?? '';
+
+      texto += `${id}\t${media}\n`;
+    });
+
+    navigator.clipboard.writeText(texto);
+    alert('ID + Média copiados para a área de transferência!');
+  }
+
   return (
     <div className="mt-10 space-y-6">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-4">
+
+        <button
+          type="button"
+          onClick={handleCopiarTudo}
+          className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+        >
+          Copiar tudo
+        </button>
+
         <button
           type="button"
           onClick={handleDownloadXlsx}
@@ -92,6 +117,13 @@ function TabelaPorFiltro({ grupo }: { grupo: any }) {
             Filtro aplicado:{' '}
             <span className="font-semibold">
               {grupo.filtroAplicado}
+            </span>
+          </p>
+
+          <p className="text-sm text-gray-600">
+            Período aquisitivo:{' '}
+            <span className="font-semibold">
+              {grupo.periodoAquisitivo}
             </span>
           </p>
         </div>

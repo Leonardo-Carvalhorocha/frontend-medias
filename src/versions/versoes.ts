@@ -28,5 +28,10 @@ export const versoes: Versao[] = [
     numero: '0.0.7',
     descricao:
     'Criação front e backend adicionando em nossa base de dados os funcionários do ADTO, não é preciso enviar arquivo para consulta. Alexia Sarah (RH)'
+  },
+  {
+    numero: '0.0.8',
+    descricao:
+    'Adicionado botão para copiar tudo, ao inves de baixar. Alexia Sarah (RH)'
   }
 ];
