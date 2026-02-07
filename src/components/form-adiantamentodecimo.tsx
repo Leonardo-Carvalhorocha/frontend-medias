@@ -46,7 +46,7 @@ export default function AdiantamentoDecimoTerceiro(): JSX.Element {
   };
 
   return (
-    <>
+    <div className="p-6">
       <Header />
 
       <div className="max-w-5xl mx-auto px-4 py-6">
@@ -152,6 +152,6 @@ export default function AdiantamentoDecimoTerceiro(): JSX.Element {
           </p>
         )}
       </div>
-    </>
+    </div>
   );
 }

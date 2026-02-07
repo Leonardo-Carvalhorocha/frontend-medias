@@ -14,11 +14,14 @@ function Header() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const usuarioStorage = getUsuario();
+    const carregarUsuario = () => {
+      const usuarioStorage = getUsuario();
+      setUsuario(usuarioStorage || null);
+    };
 
-    if (usuarioStorage) {
-      setUsuario(usuarioStorage);
-    }
+    carregarUsuario();
+    window.addEventListener("usuario-updated", carregarUsuario);
+    return () => window.removeEventListener("usuario-updated", carregarUsuario);
   }, []);
 
   function confirmarLogout(): void {
@@ -37,9 +40,16 @@ function Header() {
 
           {usuario && (
             <div className="flex items-center gap-4 text-sm text-gray-700">
-              <span>
-                Olá, <strong>{usuario.nome}</strong>
-              </span>
+
+               <Link
+                to="/usuario/editar"
+                className="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+              >
+                <span>
+                  Olá, <strong>{usuario.nome}</strong>
+                </span>              
+              </Link>
+
 
               {/* NOVO ITEM */}
               <Link

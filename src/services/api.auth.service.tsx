@@ -32,6 +32,7 @@ export let setTokenLocalStorage = (token: string) => {
 export let setUsuarioLocalStorage = (usuario: Usuario) => {
     if(usuario) {
       localStorage.setItem(localStorageNames.usuario, JSON.stringify(usuario));
+      window.dispatchEvent(new Event("usuario-updated"));
     }
 }
 
@@ -46,5 +47,18 @@ export let removeUsuarioLocalStorage = () => {
     const usuario = getUsuario();
     if(usuario) {
         localStorage.removeItem(localStorageNames.usuario);
+        window.dispatchEvent(new Event("usuario-updated"));
     }
+}
+
+export type AtualizarUsuarioDTO = {
+    email: string;
+    senhaAtual?: string;
+    novaSenha?: string;
+    nome: string;
+};
+
+export let atualizarUsuario = async (dados: AtualizarUsuarioDTO): Promise<{usuario: Usuario}> => {
+    let response = await api.put<{usuario: Usuario}>('/usuario/atualizar', dados);
+    return response.data;
 }

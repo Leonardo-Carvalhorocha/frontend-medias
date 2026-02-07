@@ -35,7 +35,10 @@ api.interceptors.response.use(
 
       // logout
       if (status === 401 && token) {
-        window.dispatchEvent(new Event("logout-modal"));
+        // Não desloga se o erro for na rota de atualizar usuário (provavelmente senha incorreta)
+        if (!error.config?.url?.includes("/usuario/atualizar")) {
+          window.dispatchEvent(new Event("logout-modal"));
+        }
       }
     }
 

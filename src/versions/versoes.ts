@@ -33,5 +33,10 @@ export const versoes: Versao[] = [
     numero: '0.0.8',
     descricao:
     'Adicionado botão para copiar tudo, ao inves de baixar. Alexia Sarah (RH)'
+  },
+  {
+    numero: '0.0.9',
+    descricao:
+    'Implementada tela de edição de dados do usuário (Nome e Senha), com validação de senha atual para segurança e atualização automática do nome no cabeçalho após a edição.'
   }
 ];

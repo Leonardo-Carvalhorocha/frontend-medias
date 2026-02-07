@@ -13,6 +13,7 @@ import {
 import VersaoImplementacoes from "../components/versao-implementacoes";
 import GlobalError from "../components/GlobalError";
 import AdiantamentoDecimoTerceiro from "../components/form-adiantamentodecimo";
+import FormEditarUsuario from "../components/form-editar-usuario";
 
 function AppRoutes() {
   const [openModal, setOpenModal] = useState(false);
@@ -59,6 +60,7 @@ function AppRoutes() {
                 element={<VersaoImplementacoes />}
               />
               <Route path="/filtro-adto" element={<AdiantamentoDecimoTerceiro />}/>
+              <Route path="/usuario/editar" element={<FormEditarUsuario />} />
             </Route>
           </Routes>
         </div>
